@@ -26,7 +26,7 @@ abstract class MyCovariantGenericList[+A] {
   def ++[B >: A](list: MyCovariantGenericList[B]): MyCovariantGenericList[B]
 }
 
-object CovariantGenericEmpty extends MyCovariantGenericList[Nothing] {
+case object CovariantGenericEmpty extends MyCovariantGenericList[Nothing] {
 
   def head: Nothing = throw new NoSuchElementException
 
@@ -47,7 +47,7 @@ object CovariantGenericEmpty extends MyCovariantGenericList[Nothing] {
   override def ++[B >: Nothing](list: MyCovariantGenericList[B]): MyCovariantGenericList[B] = list
 }
 
-class CovariantGenericCons[+A](h: A, t: MyCovariantGenericList[A]) extends MyCovariantGenericList[A] {
+case class CovariantGenericCons[+A](h: A, t: MyCovariantGenericList[A]) extends MyCovariantGenericList[A] {
 
   def head: A = h
 
@@ -84,6 +84,7 @@ trait MyTransformer[-A, B] {
 
 object ExpandedListTest extends App {
   val listOfIntegers: MyCovariantGenericList[Int] = new CovariantGenericCons[Int](1, new CovariantGenericCons[Int](2, new CovariantGenericCons[Int](3, CovariantGenericEmpty)))
+  val clonedListOfIntegers: MyCovariantGenericList[Int] = new CovariantGenericCons[Int](1, new CovariantGenericCons[Int](2, new CovariantGenericCons[Int](3, CovariantGenericEmpty)))
   val anotherListOfIntegers: MyCovariantGenericList[Int] = new CovariantGenericCons[Int](4, new CovariantGenericCons[Int](5, new CovariantGenericCons[Int](6, CovariantGenericEmpty)))
   val listOfString: MyCovariantGenericList[String] = new CovariantGenericCons[String]("Hello,", new CovariantGenericCons[String]("Learning", new CovariantGenericCons[String]("Scala", CovariantGenericEmpty)))
 
@@ -103,5 +104,12 @@ object ExpandedListTest extends App {
   println(listOfIntegers.flatMap(new MyTransformer[Int, MyCovariantGenericList[Int]] {
     override def transform(elem: Int): MyCovariantGenericList[Int] = new CovariantGenericCons(elem, new CovariantGenericCons(elem + 1, CovariantGenericEmpty))
   }).toString)
+
+  /*
+  checking case class equality: below statement returns true. coz, equals and hash code are already implemented with Case class.
+   */
+
+  println(listOfIntegers == clonedListOfIntegers)
+
 
 }

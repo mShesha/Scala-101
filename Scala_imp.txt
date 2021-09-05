@@ -1,0 +1,238 @@
+Scala important:
+
+Variables: Var -- side effects
+chaging a variable
+printing something to console
+displaying something to the screen
+
+expressions:
+
+expressions are evaluated to a value and they have a type
+ex : val x = 1+2 (values = 3/ type = Int)
+
+instructions (DO) vs expressions (VALUE and/or has a TYPE) in scala or in functional programing in general, we think in terms of expressions.
+every single line of code, has a value and/or a type
+
+if in scala is an expression.
+
+ex : 
+
+val aValue = if(true) 3 else 5
+
+unit is a spl data type in scala === void in Java. it means, return nothing.
+value of unit is ()
+
+what is a side effect : any expression returning a Unit is called a side effect.
+eg : println(), while or loops, reassigning to var
+
+codeblocks ::1)  speacial kind of expressions. coz they have few extra properties
+2) value of the block is the value of it's last expression.
+3) variables/values defined in a codeblock is not accessible outside
+
+eg: 
+val aCodeBlock = {
+	val y = 2
+	val z = y+1
+	if (z >2) "hello" else "goodbye"
+}
+
+functions:
+
+NOTE : when we need loops, use recurssion
+worst thing to do is use imperative code with scala syntax
+compiler knows the return type of the function as well.	
+recurssive function needs to have a return type
+
+stack and tail recursion:
+
+tail recursion: use recursive call as the last expression. and tail recursions doesn't need to save intermediate results to pass it on to the previous recursive call.
+
+call functions by name vs call by value:
+
+call by value : the variable/parameter is evaluated before the function call is made ( so, the value will be same how many ever times it is printed/used)
+call by name : the expression is passed as is to the function without being evaluated. whenever/whereever it is used, the expression will be calculated on the fly. there are chnaces that it might change over time/code.
+
+=> symbol delays the evaluation of the expression passed as a parameter until it is used.
+
+example :
+
+def callByValue(x: Long) : Unit = {
+	println(System.nanotime())
+	println(System.nanotime())
+}
+
+def callByName(x: => Long) : Unit = {
+	println(System.nanotime())
+	println(System.nanotime())
+}
+
+sample o/p:
+
+123
+123
+124
+125
+
+default and named arguments:
+
+smart operations on strings:
+
+scala specific - s interpolators and f interpolators and raw interpolators( eg: println(raw"this is a \n newline"))
+
+object oriented basics:
+
+class: organizes data and behaviour (code). blueprints that describe the way the thigns should/will look like or behave like
+object : concrete realizations in memory.  instantiation.
+
+
+class Person(name: String, val age: Int) // anything in the paranthesis is a constructor
+
+object oobasics extends App{
+	val person = new Person("john", 26)
+	println(person.age)
+}
+
+// both of them above (name and age) are initially class parameters and are not class members/fields. They cannot be accessed outside of a class.
+// to convert class parameters to fields, prepend them with val keyword and they become available to access
+// class parameters are not fields..
+
+overloading : means difining methods with the same name but different signature.
+
+Note: if you need to update the class instance's fields, you need to return a new instance with the updated values. this is immutability wrt objects and classes.
+fields can have default parameters just like a method can. this avoids usage of auxillary constructors. (auxillary constructors - more than one constructor in a class.
+the only implementation they can have is to call the other/main constructor with a default value)
+
+eg:
+
+class Person(name: String, val age: Int = 0) {
+	def this(name : String) = this(name,0) // calls above line with age defaulted to 0
+	def this() = this("John Deo") // calls above line with default john doe as name
+	
+	// instead change class parameter to field and assign default value to the class field.
+}
+
+scala niceties : SYNTACTIC SUGARS
+
+infix notations == operator notation : a class method with single parameter
+
+eg: val mary = new Person("Mary","Inception")
+	println(mary.likes("Inception")) // prints true
+	println(mary likes "Inception")  // prints true
+	
+Note : ALL OPERATORS ARE METHODS
+
+prefix notations::  all about unary operators
+
+val x = -1 == val y = 1.unary_-
+// works only with -/+/~/!
+
+Note: UNARY OPERATOR METHODS ARE TO BE NAME "unary_*"
+
+postfix notation: for functions without any parameters
+
+apply() method::
+
+mary.apply() == mary() // object being called like a function
+
+scala objects:
+
+Scala doesn't have "static" values/methods
+scala objects are used to define class level functionality against instance level functionality
+when singleton object and a class with the same name is defined in the same scope, they become companions. 
+scala singleton object's apply menthod is generally used as factory method to generate new instances.
+
+Scala objects: 
+	*	are their own classs
+	*	are the only instance
+	*	singleton pattern in one line
+	
+scala companions:
+	*	can access each other's private members/fields
+
+scala applications:
+	*	it should have def main(arge: Array[String]): Unit
+	*	object objName extends App
+	
+inheritance and traits:
+
+scala has single class inheritance.
+access modifiers in scala are : private(only within the class scope)/protected(can be access inside a subclass)/public(can be accessed anywhere in the scope of that program.)
+
+constructors with inheritance:
+
+if we are extending a class with parameters, we need to specify all the required arguments from the superclass constructor. coz, when we instantiate a subclass, it's superclass also will be instantiated.
+
+overriding:
+
+methods can be overridden in the subclasses.
+just like methods, fields/variables can also be overridden. unlinke, methods, fields can be overridden in the constructor only.
+
+overRiding vs overLoading
+
+basic inheritance
+access modifiers
+constructors
+overriding
+polymosphism
+super -- is used when we need to access the elements directly from it's super class
+preventing overriding : 1) to use final keyword for the methods/variables in the super class when it should be allowed to be overridden.
+						2) final on the class itself. (won't allow to be inherited)
+						3) seal class -- extend classes in this file. but prevents extention in other files. (sealed keyword)
+						
+abstract datatype and scala type hierarchy:
+
+we need to leave few fields/methods unimplemented and to be implemented later in the scope. these are called aabstract fields/methods.
+classes hosting abstract fields/methods are called abstract classes and are defined by the keyword abstract.
+
+abstract classes cannot be instantiated.
+
+traits: ultimate abstract datatype.
+traits can be inherited along with other class and traits.
+
+diff between abstract classes and traits.
+
+AbClasses - can have abstract and non-abstract members. and so can traits..
+
+1) triats cannont have constructor parameters
+2) you can extedn only 1 class while we can mixin multiple traits..
+3) subtle matter of choice. we choose a trait vs ab class if it describes a behaviour (carnivour) while ab class describes a thing (animal)
+
+scala type hierarchy 
+
+											scala.Any
+			   scala.AnyVal												scala.AnyRef (all java object type) (all classes we use are derived from AnyRef (string,set/user derived calsses person etc)
+	int/boolean/float/char(premitive values in scala)					scala.Null -- only instance is the null reference. which means no reference -- null extends everything. replace anything with Null.
+		
+									derived from everything is scala.Nothing -- it can replace everything. sub type of every single type in Scala. no instance of anything at all.
+									
+generics: use the same code on potentitally unrelated types.
+
+allows to accept any datatype. example, we create a linked list with type int, if we need to create a LL with strings, we need to replicate the entire thing again. 
+use generics instead. 
+
+variance problem: if class A extends B,
+will List[A] extend List[B]??
+
+3 answers: 
+1) covariance -- yes. [+A] ==> any super class type accepts all subclass types. 
+2) invariance -- no. [A] ==> super class only take super class types
+3) contravariance -- hell no. [-A] ==> any subclass will accept any class of supertype.
+
+Bounded types : you can mark a class or a method to accept any class of it's super class type or it's sub class type.
+
+Anonymous classes: we can instantiate types and override fields or methods on the spot. 
+rules: pass in the required constructor arguments if needed
+	   implement all abstract fields/methods
+workds for traits and classes, weather abstract or not!
+
+we can instantiate classes and methods on the fly without actually giving it a name. compiler would in the backside would give it a name. these are called anonymous classes.
+
+case classes: 
+quick lightweight DS with little boilerplate.
+companions already implemented.
+sensible equals, hashCode, toString
+Auto-promoted param to fields
+Cloning
+Case objects
+serializable
+and can be used in pattern matching.
