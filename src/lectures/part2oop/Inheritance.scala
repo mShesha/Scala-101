@@ -1,5 +1,7 @@
 package lectures.part2oop
 
+import scala.language.postfixOps
+
 object Inheritance extends App {
 
   // Single class inheritance
