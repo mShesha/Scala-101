@@ -194,14 +194,16 @@ diff between abstract classes and traits.
 AbClasses - can have abstract and non-abstract members. and so can traits..
 
 1) triats cannont have constructor parameters
-2) you can extedn only 1 class while we can mixin multiple traits..
+2) you can extend only 1 class while we can mixin multiple traits..
 3) subtle matter of choice. we choose a trait vs ab class if it describes a behaviour (carnivour) while ab class describes a thing (animal)
 
 scala type hierarchy 
 
 											scala.Any
-			   scala.AnyVal												scala.AnyRef (all java object type) (all classes we use are derived from AnyRef (string,set/user derived calsses person etc)
-	int/boolean/float/char(premitive values in scala)					scala.Null -- only instance is the null reference. which means no reference -- null extends everything. replace anything with Null.
+			   scala.AnyVal												scala.AnyRef (all java object type) (all classes we use are derived from AnyRef (string,set/user 
+			                                                                                                      derived calsses person etc)
+	int/boolean/float/char(premitive values in scala)					scala.Null -- only instance is the null reference. which means no reference -- null extends everything.
+																													replace anything with Null.
 		
 									derived from everything is scala.Nothing -- it can replace everything. sub type of every single type in Scala. no instance of anything at all.
 									
@@ -236,3 +238,43 @@ Cloning
 Case objects
 serializable
 and can be used in pattern matching.
+
+functional programming in Scala:
+
+What is a function?
+
+we want to work with functions as we work with values. i.e, 
+1) be able to pass it on as a parameter
+2) be able to return it as a result.
+3) use functions as values.
+
+
+
+higher order functions : these are the functions which receive functions as parameter or returns functions as return type.
+
+curried function : The "currying" is the process of taking the function of multiple arguments and converting it into a series of functions that each take a single argument and 
+				   return a function of a single argument, or in the case of the final function, return the actual result.
+				   
+				   The main benefit of currying is when you need to call the same functions with some of the same parameters a lot. 
+				   In these situations, currying becomes a good technique to use as it will make your code easier to refactor.
+				   
+				   Currying is basically translating a function of N arguments to a 'tree' of N nested functions, each taking one argument.
+
+Anonymous functions: Anonymous functions are unnamed functions that can be written as little snippets of code. 
+					 They are useful when we want to write a function inline without any explicit definitions.
+					 
+HOF and curried functions - exercise - pending.
+					 
+					 
+
+Monads -- it is a construct which does successive calculations. Monad wraps one object inside another and passes it along.
+
+Closure -- it is a function whose return type depends on the variable defined outside it's scope
+
+What is functional programming?
+
+diamond problem and how does scala solve it?
+
+by using traits and lineage. Scala doesn't allow to inherit from multipl classes. but can inherit from multiple traits.
+
+In Scala, Monads is a construction which performs successive calculations.
