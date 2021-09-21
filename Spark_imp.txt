@@ -1,0 +1,231 @@
+IP:
+
+Spark VS Hadoop : https://phoenixnap.com/kb/hadoop-vs-spark
+
+Spark:
+
+effectiveness:
+
+speed:
+
+1) better commodity hardwares at cheaper rates. n number of cores with gigabytes of memory. Multiprocessing and parallel processing abilities.
+2) spark's DAG scheduler and query optimizer is really well written piece of code with helps in improving the performance of spark.
+3) spark's execution engine - tungston 
+4) with all the intermediate results stored in memory, it really gives a performance boost.
+
+ease of use:
+
+1) provides simple abstract in the name of RDD. DS and DFs are built on top of this.
+2) simple programming model using transformations and actions.
+
+modularity:
+
+1) spark can be used for any type of workload and can be written in many languages.
+
+extensibility:
+
+1) spark focuses on parallel computation engine rather than on storage. As opposed to Hadoop.
+2) it means spark can read from myriad sources - RDBMS, kafka, cassandra, azure storage, amazon S3 etc.
+
+spark architecture:
+
+Spark application
+	|
+Spark driver program  --> instantiates spark session/talks to the cluster manager for resources (CPUs and memories), transforms spark operatiosn to DAG, schedules DAGs and distributes them to executors. Once resources are allocated, driver program directly communicates with the executors
+	|
+Spark session --> provides a single unified entry to all the spark functionality. i.e, hiveContext/SQLContext/StreamingContext/SparkContext etc
+
+Cluster manager --> responsible for managing and allocating resources for the cluster of nodes where the spark applications can run. Currently supports 4 cluster managers : YARN/built-in stand alone cluster manager/ Mesos/ Kubernetes
+
+Spark executors --> spark executor software runs on every worker node in the cluster. communicate with teh driver program and are responsible for executing tasks on the workers. 
+
+Application
+A user program built on Spark using its APIs. It consists of a driver program and
+executors on the cluster.
+SparkSession
+An object that provides a point of entry to interact with underlying Spark functionality
+and allows programming Spark with its APIs. In an interactive Spark
+shell, the Spark driver instantiates a SparkSession for you, while in a Spark
+application, you create a SparkSession object yourself.
+Job
+A parallel computation consisting of multiple tasks that gets spawned in response
+to a Spark action (e.g., save(), collect()).
+Stage
+Each job gets divided into smaller sets of tasks called stages that depend on each
+other.
+Task
+A single unit of work or execution that will be sent to a Spark executor
+
+Spark Jobs
+During interactive sessions with Spark shells, the driver converts your Spark application
+into one or more Spark jobs. It then transforms each job into a
+DAG. This, in essence, is Spark’s execution plan, where each node within a DAG
+could be a single or multiple Spark stages.
+
+Spark Stages
+As part of the DAG nodes, stages are created based on what operations can be performed
+serially or in parallel (Figure 2-4)y be divided into multiple stages. Often stages are delineated
+on the operator’s computation boundaries, where they dictate data transfer among
+Spark executors.
+
+Spark Tasks
+Each stage is comprised of Spark tasks (a unit of execution), which are then federated
+across each Spark executor; each task maps to a single core and works on a single partition
+of data. As such, an executor with 16 cores can have 16 or more
+tasks working on 16 or more partitions in parallel, making the execution of Spark’s
+tasks exceedingly parallel!
+
+imp: 1 task -> 1 executor core -> 1 partition
+eg: 16 cores per executor, means 16 tasks parallely with 16 data partitions per executor
+
+Transformations, Actions, and Lazy Evaluation
+
+Spark operations on distributed data can be classified into two types: transformations
+and actions. Transformations, as the name suggests, transform a Spark DataFrame
+into a new DataFrame without altering the original data, giving it the property of
+immutability. Put another way, an operation such as select() or filter() will not
+change the original DataFrame; instead, it will return the transformed results of the
+operation as a new DataFrame.
+
+All transformations are evaluated lazily. That is, their results are not computed immediately,
+but they are recorded or remembered as a lineage. A recorded lineage allows
+Spark, at a later time in its execution plan, to rearrange certain transformations, coalesce
+them, or optimize transformations into stages for more efficient execution. Lazy
+evaluation is Spark’s strategy for delaying execution until an action is invoked or data
+is “touched” (read from or written to disk).
+
+While lazy evaluation allows Spark to optimize your queries by peeking into your
+chained transformations, lineage and data immutability provide fault tolerance.
+Because Spark records each transformation in its lineage and the DataFrames are
+immutable between transformations, it can reproduce its original state by simply
+replaying the recorded lineage, giving it resiliency in the event of failures.
+
+Narrow and Wide Transformations
+
+Transformations can be classified as having either narrow dependencies or wide
+dependencies. Any transformation where a single output partition can be computed
+from a single input partition is a narrow transformation. For example, in the previous
+code snippet, filter() and contains() represent narrow transformations because
+they can operate on a single partition and produce the resulting output partition
+without any exchange of data.
+However, groupBy() or orderBy() instruct Spark to perform wide transformations,
+where data from other partitions is read in, combined, and written to disk. Since each
+partition will have its own count of the word that contains the “Spark” word in its row
+of data, a count (groupBy()) will force a shuffle of data from each of the executor’s
+partitions across the cluster. In this transformation, orderBy() requires output from
+other partitions to compute the final aggregation.
+
+Spark: What’s Underneath an RDD?
+The RDD is the most basic abstraction in Spark. There are three vital characteristics
+associated with an RDD:
+• Dependencies
+• Partitions (with some locality information)
+• Compute function: Partition => Iterator[T]
+
+page 47:
+
+Spark DataFrames are like distributed in-memory tables with named columns and
+schemas, where each column has a specific data type
+
+Defining a schema
+up front as opposed to taking a schema-on-read approach offers three benefits:
+
+• You relieve Spark from the onus of inferring data types.
+• You prevent Spark from creating a separate job just to read a large portion of
+your file to ascertain the schema, which for a large data file can be expensive and
+time-consuming.
+• You can detect errors early if data doesn’t match the schema.
+
+
+
+
+
+
+
+
+
+
+********************************************************************************************
+
+Interview prep:
+
+Spark tuning techniques:
+
+1: serialization technique: by default spark uses java serializer. we can configure it to kryo serializer.
+
+conf.set(“spark.serializer”, “org.apache.spark.serializer.KryoSerializer”)
+
+ 
+
+Code:
+val conf = new SparkConf().setMaster(…).setAppName(…)
+
+conf.registerKryoClasses(Array(classOf[MyClass1], classOf[MyClass2]))
+
+val sc = new SparkContext(conf)
+
+Serialization plays an important role in the performance of any distributed application and we know that by default Spark uses the Java serializer on the JVM platform. Instead of Java serializer, Spark can also use another serializer called Kryo. The Kryo serializer gives better performance as compared to the Java serializer.
+
+Kryo serializer is in a compact binary format and offers approximately 10 times faster speed as compared to the Java Serializer. To set the Kryo serializer as part of a Spark job, we need to set a configuration property, which is org.apache.spark.serializer.KryoSerializer.
+
+
+Kryo is significantly faster and more compact than Java serialization (often as much as 10x), but does not support all Serializable types and requires you to register the classes you'll use in the program in advance for best performance
+
+2: API selection: RDD vs dataframes vs datasets
+
+Spark introduced three types of API to work upon – RDD, DataFrame, DataSet
+RDD is used for low level operation with less optimization
+DataFrame is best choice in most cases due to its catalyst optimizer and low garbage collection (GC) overhead.
+Dataset is highly type safe and use encoders.  It uses Tungsten for serialization in binary format.
+
+3: Advanced variables: broadcast and accumulators : broadcast joins
+
+4: cache and persist - 
+	Cache()   – Always in Memory
+	Persist() – Memory and disks
+
+5:  ByKey Operation
+Shuffles are heavy operation which consume a lot of memory.
+While coding in Spark, the user should always try to avoid shuffle operation.
+High shuffling may give rise to an OutOfMemory Error; To avoid such an error, the user can increase the level of parallelism.
+Use reduceByKey instead of groupByKey.
+Partition the data correctly.
+As we know during our transformation of Spark we have many ByKey operations. ByKey operations generate lot of shuffle. Shuffles are heavy operation because they consume a lot of memory. While coding in Spark, a user should always try to avoid any shuffle operation because the shuffle operation will degrade the performance. If there is high shuffling then a user can get the error out of memory. Inthis case, to avoid that error, a user should increase the level of parallelism. Instead of groupBy, a user should go for the reduceByKey because groupByKey creates a lot of shuffling which hampers the performance, while reduceByKey does not shuffle the data as much. Therefore, reduceByKey is faster as compared to groupByKey. Whenever any ByKey operation is used, the user should partition the data correctly.
+
+6: File Format selection
+Spark supports many formats, such as CSV, JSON, XML, PARQUET, ORC, AVRO, etc.
+Spark jobs can be optimized by choosing the parquet file with snappy compression which gives the high performance and best analysis.
+Parquet file is native to Spark which carries the metadata along with its footer.
+Spark comes with many file formats like CSV, JSON, XML, PARQUET, ORC, AVRO and more. A Spark job can be optimized by choosing the parquet file with snappy compression. Parquet file is native to Spark which carry the metadata along with its footer as we know parquet file is native to spark which is into the binary format and along with the data it also carry the footer it’s also carries the metadata and its footer so whenever you create any parquet file, you will see .metadata file  on the same directory along with the data file.
+
+7: Garbage Collection Tuning
+JVM garbage collection can be a problem when you have large collection of unused objects.
+The first step in GC tuning is to collect statistics by choosing – verbose while submitting spark jobs.
+In an ideal situation we try to keep GC overheads < 10% of heap memory.
+As we know underneath our Spark job is running on the JVM platform so JVM garbage collection can be a problematic when you have a large collection of an unused object so the first step in tuning of garbage collection is to collect statics by choosing the option in your Spark submit verbose. Generally, in an ideal situation we should keep our garbage collection memory less than 10% of heap memory.
+
+8: Level of Parallelism
+Parallelism plays a very important role while tuning spark jobs.
+Every partition ~ task requires a single core for processing.
+There are two ways to maintain the parallelism:
+Repartition: Gives equal number of partitions with high shuffling
+Coalesce: Generally reduces the number of partitions with less shuffling.
+In any distributed environment parallelism plays very important role while tuning your Spark job. Whenever a Spark job is submitted, it creates the desk that will contain stages, and the tasks depend upon partition so every partition or task requires a single core of  the system for processing. There are two ways to maintain the parallelism – Repartition and Coalesce. Whenever you apply the Repartition method it gives you equal number of partitions but it will shuffle a lot so it is not advisable to go for Repartition when you want to lash all the data.  Coalesce will generally reduce the number of partitions and creates less shuffling of data.
+
+Q) what is salting?
+Salting. In a SQL join operation, the join key is changed to redistribute data in an even manner so that processing for a partition does not take more time. This technique is called salting. ... After the shuffle stage induced by the join operation, all the rows with the same key need to be in the same partition
+
+Q) What is the best number of partitions?
+The ideal size of each partition is around 100-200 MB. The smaller size of partitions will increase the parallel running jobs, which can improve performance, but too small of a partition will cause overhead and increasing the GC time.
+
+Q) How do I choose a spark partition?
+The best way to decide on the number of partitions in an RDD is to make the number of partitions equal to the number of cores in the cluster so that all the partitions will process in parallel and the resources will be utilized in an optimal way.
+
+
+
+
+ACID stands for four traits of database transactions:  Atomicity (an operation either succeeds completely or fails, it does not leave partial data), Consistency (once an application performs an operation the results of that operation are visible to it in every subsequent operation), Isolation (an incomplete operation by one user does not cause unexpected side effects for other users), and Durability (once an operation is complete it will be preserved even in the face of machine or system failure).
+
+default block size : 128MB 	
+4x of partitions to the number of cores in cluster available 
+By default, DataFrame shuffle operations create 200 partitions.
